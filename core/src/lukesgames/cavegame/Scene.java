@@ -10,6 +10,12 @@ public class Scene {
     public Scene() {
         needSceneChange = false;
         destinationSceneChange = 0;
+
+    }
+
+    public void start() {
+        //bring up all resources needed here
+        //textures, music, et cetera
     }
 
     public void draw(SpriteBatch batch) {
@@ -18,5 +24,10 @@ public class Scene {
 
     public void update() {
 
+    }
+
+    public void end() {
+        //save scene state if needed
+        //dispose of all resources here
     }
 }
