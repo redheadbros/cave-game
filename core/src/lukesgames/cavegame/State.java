@@ -27,6 +27,7 @@ public class State {
     public void update() {
         scenes[currentScene].update();
         if (scenes[currentScene].needSceneChange) {
+            scenes[currentScene].needSceneChange = false;
             scenes[currentScene].end();
             currentScene = scenes[currentScene].destinationSceneChange;
             scenes[currentScene].start();
