@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class DeathScene {
+public class DeathScene extends Scene {
     private Texture yourDead;
 
     public DeathScene() {
