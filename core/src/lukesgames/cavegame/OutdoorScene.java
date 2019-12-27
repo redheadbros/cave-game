@@ -4,22 +4,22 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class CaveScene extends Scene {
-    private Texture spookyTime;
+public class OutdoorScene {
+    private Texture spookyCave;
 
-    public CaveScene() {
+    public OutdoorScene() {
         super();
     }
 
     public void start() {
-        spookyTime = new Texture(Gdx.files.internal("ominous boi.png"));
+        spookyCave = new Texture(Gdx.files.internal("ominous cave.png"));
     }
 
     public void draw(SpriteBatch batch) {
-        batch.draw(spookyTime, 0, 0);
+        batch.draw(spookyCave, 0, 0);
     }
 
     public void end() {
-        spookyTime.dispose();
+        spookyCave.dispose();
     }
 }

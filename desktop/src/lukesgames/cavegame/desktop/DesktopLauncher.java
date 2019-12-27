@@ -7,9 +7,9 @@ import lukesgames.cavegame.CaveGame;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.title = "is this love?";
-		config.width = 500;
-		config.height = 500;
+		config.title = "you have discovered a cave.";
+		config.width = 512;
+		config.height = 512;
 		new LwjglApplication(new CaveGame(), config);
 	}
 }
