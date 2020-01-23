@@ -7,15 +7,11 @@ public class State {
     int currentScene;
 
     public State() {
-        scenes = new Scene[3];
-        Scene outdoorScene = new OutdoorScene();
-        Scene caveScene = new CaveScene();
-        Scene deathScene = new DeathScene();
+        scenes = new Scene[1];
+        Scene outdoorScene = new CarScene();
         scenes[0] = outdoorScene;
-        scenes[1] = caveScene;
-        scenes[2] = deathScene;
 
-        currentScene = Ids.Scenes.OUTDOOR_SCENE;
+        currentScene = Ids.Scenes.CAR_SCENE;
 
         scenes[currentScene].start();
     }
