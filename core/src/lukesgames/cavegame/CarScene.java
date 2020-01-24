@@ -13,6 +13,10 @@ public class CarScene extends Scene {
     private Texture carImage;
     private TextureRegion carRegion;
     private Car car;
+    int carCenterX = 16;
+    int carCenterY = 16;
+    int screenWidth = 512;
+    int screenHeight = 512;
 
     public CarScene() {
         super();
@@ -32,8 +36,12 @@ public class CarScene extends Scene {
         Gdx.gl.glClearColor(1,1,1,0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         //batch.draw(background,0,0); //add this in when you have a pic
+
+        car.clampPositionTo(0, screenWidth,0, screenHeight);
         Vector2 carPosition = car.getPosition();
-        batch.draw(carRegion, carPosition.x, carPosition.y,16,16,32,32,1,1,car.rotationAngle);
+
+        batch.draw(carRegion, carPosition.x, carPosition.y, carCenterX, carCenterY,
+                32,32,1,1, car.rotationAngle);
     }
 
     public void update() {

@@ -43,4 +43,9 @@ public class Car {
     public Vector2 getPosition() {
         return position;
     }
+
+    public void clampPositionTo(int minX, int maxX, int minY, int maxY) {
+        position.x = Math.max(minX, Math.min(position.x, maxX));
+        position.y = Math.max(minY, Math.min(position.y, maxY));
+    }
 }
