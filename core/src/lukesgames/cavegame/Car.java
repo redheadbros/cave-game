@@ -3,9 +3,10 @@ package lukesgames.cavegame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
+
+import static java.lang.Math.abs;
 
 public class Car {
 
@@ -14,7 +15,10 @@ public class Car {
     private Vector2 bodyDirection;
     public float rotationAngle;
 
-    public float moveSpeed;
+    //temporary move variables
+    public float maxAccelPower;
+    public float accelMargin;
+    public float desiredSpeed;
 
     private long prevFrameTime;
     private boolean isFirstFrame;
@@ -24,11 +28,14 @@ public class Car {
 
     public Car() {
         controlDirection = new Vector2(0,0);
-        position = new Vector2(50,50);
+        position = new Vector2(256,256);
         velocity = new Vector2(0,0);
         bodyDirection = new Vector2(0,1);
 
-        moveSpeed = 30f/100f;
+        //temporary move variables
+        maxAccelPower = 300f/1000f;
+        accelMargin = 10000f/100f;
+        desiredSpeed = 30f/100f;
 
         isFirstFrame = true;
 
@@ -71,15 +78,24 @@ public class Car {
         if (!isFirstFrame) {
             long deltaTime = TimeUtils.millis() - prevFrameTime;
 
-            velocity = controlDirection.cpy().scl(moveSpeed);
-
-            position.x += deltaTime * velocity.x;
-            position.y += deltaTime * velocity.y;
-
             //TODO new version, for turning and stuff:
             //calculate forces / acceleration
+
+            //temporary version:
+            Vector2 acceleration = new Vector2(0,0);
+            acceleration.x = accelerateToValue(desiredSpeed, velocity.x, accelMargin, maxAccelPower) * controlDirection.x;
+            acceleration.y = accelerateToValue(desiredSpeed, velocity.y, accelMargin, maxAccelPower) * controlDirection.y;
+
+            //calculate friction force
+            //calculate wheel force
+            //calculate turning force
+
             //apply acceleration to velocity
+            velocity.mulAdd(acceleration, (float) deltaTime);
+
             //apply velocity to position
+            position.mulAdd(velocity, (float) deltaTime);
+
 
         } else {
             isFirstFrame = false;
@@ -95,5 +111,14 @@ public class Car {
     public void clampPositionTo(int minX, int maxX, int minY, int maxY) {
         position.x = Math.max(minX, Math.min(position.x, maxX));
         position.y = Math.max(minY, Math.min(position.y, maxY));
+    }
+
+    private float accelerateToValue(float desiredValue, float currentValue, float margin, float maxAcceleration) {
+        float maxRateOfChange = abs(maxAcceleration);
+        if (currentValue >= desiredValue) {
+            return Math.max(-maxRateOfChange, -(currentValue - desiredValue) * maxRateOfChange / margin);
+        } else {
+            return Math.min(maxRateOfChange, -(currentValue - desiredValue) * maxRateOfChange / margin);
+        }
     }
 }
