@@ -70,8 +70,16 @@ public class Car {
     public void update() {
         if (!isFirstFrame) {
             long deltaTime = TimeUtils.millis() - prevFrameTime;
-            position.x += deltaTime * moveSpeed * controlDirection.x;
-            position.y += deltaTime * moveSpeed * controlDirection.y;
+
+            velocity = controlDirection.cpy().scl(moveSpeed);
+
+            position.x += deltaTime * velocity.x;
+            position.y += deltaTime * velocity.y;
+
+            //TODO new version, for turning and stuff:
+            //calculate forces / acceleration
+            //apply acceleration to velocity
+            //apply velocity to position
 
         } else {
             isFirstFrame = false;
