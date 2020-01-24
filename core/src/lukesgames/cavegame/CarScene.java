@@ -37,7 +37,7 @@ public class CarScene extends Scene {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         //batch.draw(background,0,0); //add this in when you have a pic
 
-        car.clampPositionTo(0, screenWidth,0, screenHeight);
+        car.clampPositionTo(0, screenWidth-32,0, screenHeight-32);
         Vector2 carPosition = car.getPosition();
 
         batch.draw(carRegion, carPosition.x, carPosition.y, carCenterX, carCenterY,
