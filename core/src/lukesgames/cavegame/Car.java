@@ -12,7 +12,8 @@ public class Car {
     //values that change
     private Vector2 position;
     private Vector2 velocity;
-    public float rotationAngle;
+    public float bodyRotation;
+    public float relativeWheelAngle;
     private float accelerationMagnitude;
 
     //constant values
@@ -34,13 +35,24 @@ public class Car {
         controlVector = new Vector2(0,0);
         position = new Vector2(256,256);
         velocity = new Vector2(0,0);
-        rotationAngle = 0;
+        bodyRotation = 0;
+        relativeWheelAngle = 0;
         accelerationMagnitude = 0;
 
         //all of the following are constants
         frictionCoefficient = 0.3f;
         turnSpeed = 180; //degrees per second
         turnVectorCoefficient = 3f;
+        //note: the turning looks realistic, but is a facade. If the turnVectorCoefficient
+        //  is increased, the car constantly looks like it's 'drifting.' It needs to be
+        //  a formula based off of other stuff, though I'm not sure what.
+        //  also, the car can turn in place like a tank, currently. Not so realistic.
+        //  solution, perhaps: how the BODY of the car turns should be based off of other
+        //  stuff, like speed and the turn vector.
+
+        //IMPORTANT IDEA NOTE:
+        //  do the dot product of the velocity of the car and the direction of the wheels
+        //  to get a measure of how much effective an acceleration attempt should be.
 
         desiredSpeed = 300;
         speedMargin = 10;
@@ -85,7 +97,7 @@ public class Car {
         float deltaTime = Gdx.graphics.getDeltaTime(); //in seconds
 
         //turn the car
-        rotationAngle -= deltaTime * turnSpeed * controlVector.x;
+        bodyRotation -= deltaTime * turnSpeed * controlVector.x;
 
         //calculate forces / acceleration:
         //calculate friction acceleration
@@ -100,7 +112,7 @@ public class Car {
             case 1:
                 accelerationMagnitude = accelerateToValue(desiredSpeed, velocity.len(), speedMargin, maxAcceleration);
                 acceleration.y = accelerationMagnitude;
-                acceleration.rotate(rotationAngle);
+                acceleration.rotate(bodyRotation);
                 break;
             case -1:
                 accelerationMagnitude = accelerateToValue(0, velocity.len(), brakeMargin, maxBrake);

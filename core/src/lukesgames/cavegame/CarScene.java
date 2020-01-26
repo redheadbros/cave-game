@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 public class CarScene extends Scene {
 
     private Texture background;
+
     private Texture carImage;
     private TextureRegion carRegion;
     private Car car;
@@ -17,6 +18,9 @@ public class CarScene extends Scene {
     int carCenterY = 16;
     int screenWidth = 512;
     int screenHeight = 512;
+
+    private Texture steeringWheel;
+    private TextureRegion wheelRegion;
 
     public CarScene() {
         super();
@@ -29,6 +33,8 @@ public class CarScene extends Scene {
         //background = new Texture(Gdx.files.internal("car game background.png"));
         carImage = new Texture(Gdx.files.internal("carmobile.png"));
         carRegion = new TextureRegion(carImage,0,0,32,32);
+        steeringWheel = new Texture(Gdx.files.internal("steering wheel.png"));
+        wheelRegion = new TextureRegion(steeringWheel,0,0,64,64);
     }
 
     @Override
@@ -37,11 +43,11 @@ public class CarScene extends Scene {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         //batch.draw(background,0,0); //add this in when you have a pic
 
-        car.clampPositionTo(0, screenWidth-32,0, screenHeight-32);
+        car.clampPositionTo(0, screenWidth-32,64, screenHeight + 32);
         Vector2 carPosition = car.getPosition();
 
         batch.draw(carRegion, carPosition.x, carPosition.y, carCenterX, carCenterY,
-                32,32,1,1, car.rotationAngle);
+                32,32,1,1, car.bodyRotation);
     }
 
     public void update() {
@@ -53,5 +59,6 @@ public class CarScene extends Scene {
         //dispose of textures
         //background.dispose();
         carImage.dispose();
+        steeringWheel.dispose();
     }
 }
