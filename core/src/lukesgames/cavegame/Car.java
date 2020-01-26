@@ -4,56 +4,60 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.TimeUtils;
 
 import static java.lang.Math.abs;
 
 public class Car {
 
+    //values that change
     private Vector2 position;
     private Vector2 velocity;
-    private Vector2 bodyDirection;
     public float rotationAngle;
+    private float accelerationMagnitude;
 
-    //temporary move variables
-    public float maxAccelPower;
-    public float accelMargin;
-    public float desiredSpeed;
+    //constant values
+    private float frictionCoefficient;
+    private float turnSpeed;
 
-    private long prevFrameTime;
-    private boolean isFirstFrame;
+    private float desiredSpeed;
+    private float speedMargin;
+    private float maxAcceleration;
 
-    private Vector2 controlDirection;
+    private float brakeMargin;
+    private float maxBrake;
+
+    private Vector2 controlVector;
 
 
     public Car() {
-        controlDirection = new Vector2(0,0);
+        controlVector = new Vector2(0,0);
         position = new Vector2(256,256);
         velocity = new Vector2(0,0);
-        bodyDirection = new Vector2(0,1);
+        rotationAngle = 0;
+        accelerationMagnitude = 0;
 
-        //temporary move variables
-        maxAccelPower = 300f/1000f;
-        accelMargin = 10000f/100f;
-        desiredSpeed = 30f/100f;
+        //all of the following are constants
+        frictionCoefficient = 0.5f;
+        turnSpeed = 180; //degrees per second
 
-        isFirstFrame = true;
+        desiredSpeed = 900;
+        speedMargin = 10;
+        maxAcceleration = 1000;
+
+        brakeMargin = 10;
+        maxBrake = 40;
 
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
             public boolean keyDown(int keyCode) {
                 if (keyCode == Input.Keys.UP) {
-                    rotationAngle = 0;
-                    controlDirection.y += 1;
+                    controlVector.y += 1;
                 } else if (keyCode == Input.Keys.DOWN) {
-                    rotationAngle = 180;
-                    controlDirection.y -= 1;
+                    controlVector.y -= 1;
                 } else if (keyCode == Input.Keys.LEFT) {
-                    rotationAngle = 90;
-                    controlDirection.x -= 1;
+                    controlVector.x -= 1;
                 } else if (keyCode == Input.Keys.RIGHT) {
-                    rotationAngle = 270;
-                    controlDirection.x += 1;
+                    controlVector.x += 1;
                 }
                 return true;
             }
@@ -61,13 +65,13 @@ public class Car {
             @Override
             public boolean keyUp(int keyCode) {
                 if (keyCode == Input.Keys.UP) {
-                    controlDirection.y -= 1;
+                    controlVector.y -= 1;
                 } else if (keyCode == Input.Keys.DOWN) {
-                    controlDirection.y += 1;
+                    controlVector.y += 1;
                 } else if (keyCode == Input.Keys.LEFT) {
-                    controlDirection.x += 1;
+                    controlVector.x += 1;
                 } else if (keyCode == Input.Keys.RIGHT) {
-                    controlDirection.x -= 1;
+                    controlVector.x -= 1;
                 }
                 return true;
             }
@@ -75,33 +79,36 @@ public class Car {
     }
 
     public void update() {
-        if (!isFirstFrame) {
-            long deltaTime = TimeUtils.millis() - prevFrameTime;
 
-            //TODO new version, for turning and stuff:
-            //calculate forces / acceleration
+        float deltaTime = Gdx.graphics.getDeltaTime(); //in seconds
 
-            //temporary version:
-            Vector2 acceleration = new Vector2(0,0);
-            acceleration.x = accelerateToValue(desiredSpeed, velocity.x, accelMargin, maxAccelPower) * controlDirection.x;
-            acceleration.y = accelerateToValue(desiredSpeed, velocity.y, accelMargin, maxAccelPower) * controlDirection.y;
+        //calculate forces / acceleration:
 
-            //calculate friction force
-            //calculate wheel force
-            //calculate turning force
+        //calculate friction acceleration
+        Vector2 friction = velocity.scl(-frictionCoefficient);
 
-            //apply acceleration to velocity
-            velocity.mulAdd(acceleration, (float) deltaTime);
+        //turn the car
+        rotationAngle -= deltaTime * turnSpeed * controlVector.x;
 
-            //apply velocity to position
-            position.mulAdd(velocity, (float) deltaTime);
-
-
-        } else {
-            isFirstFrame = false;
+        //get acceleration power
+        switch ((int) controlVector.y) {
+            case 1:
+                accelerationMagnitude = accelerateToValue(desiredSpeed, velocity.len(), speedMargin, maxAcceleration);
+                break;
+            case -1:
+                accelerationMagnitude = accelerateToValue(0, velocity.len(), brakeMargin, maxBrake);
+                break;
         }
 
-        prevFrameTime = TimeUtils.millis();
+        //create acceleration vector
+        Vector2 acceleration = new Vector2(0, accelerationMagnitude);
+        acceleration.rotate(rotationAngle);
+
+        //apply acceleration to velocity
+        velocity.mulAdd(acceleration, deltaTime);
+
+        //apply velocity to position
+        position.mulAdd(velocity, deltaTime);
     }
 
     public Vector2 getPosition() {
