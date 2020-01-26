@@ -18,6 +18,7 @@ public class Car {
     //constant values
     private float frictionCoefficient;
     private float turnSpeed;
+    private float turnVectorCoefficient;
 
     private float desiredSpeed;
     private float speedMargin;
@@ -37,15 +38,16 @@ public class Car {
         accelerationMagnitude = 0;
 
         //all of the following are constants
-        frictionCoefficient = 0.5f;
+        frictionCoefficient = 0.3f;
         turnSpeed = 180; //degrees per second
+        turnVectorCoefficient = 3f;
 
-        desiredSpeed = 900;
+        desiredSpeed = 300;
         speedMargin = 10;
         maxAcceleration = 1000;
 
-        brakeMargin = 10;
-        maxBrake = 40;
+        brakeMargin = 5;
+        maxBrake = 250;
 
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
@@ -82,27 +84,35 @@ public class Car {
 
         float deltaTime = Gdx.graphics.getDeltaTime(); //in seconds
 
-        //calculate forces / acceleration:
-
-        //calculate friction acceleration
-        Vector2 friction = velocity.scl(-frictionCoefficient);
-
         //turn the car
         rotationAngle -= deltaTime * turnSpeed * controlVector.x;
 
+        //calculate forces / acceleration:
+        //calculate friction acceleration
+        Vector2 friction = velocity.cpy().scl(-frictionCoefficient);
+
+        //calculate turning vector, perpendicular to velocity
+        Vector2 turnPower = velocity.cpy().rotate(-90).scl(controlVector.x * turnVectorCoefficient);
+
         //get acceleration power
+        Vector2 acceleration = new Vector2(0,0);
         switch ((int) controlVector.y) {
             case 1:
                 accelerationMagnitude = accelerateToValue(desiredSpeed, velocity.len(), speedMargin, maxAcceleration);
+                acceleration.y = accelerationMagnitude;
+                acceleration.rotate(rotationAngle);
                 break;
             case -1:
                 accelerationMagnitude = accelerateToValue(0, velocity.len(), brakeMargin, maxBrake);
+                acceleration = velocity.cpy().nor().scl(accelerationMagnitude);
+                break;
+            default:
                 break;
         }
 
         //create acceleration vector
-        Vector2 acceleration = new Vector2(0, accelerationMagnitude);
-        acceleration.rotate(rotationAngle);
+        acceleration.add(friction);
+        acceleration.add(turnPower);
 
         //apply acceleration to velocity
         velocity.mulAdd(acceleration, deltaTime);
