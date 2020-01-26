@@ -16,6 +16,11 @@ public class Car {
     public float relativeWheelAngle;
     private float accelerationMagnitude;
 
+    //testing, turny wheel bits
+    private float desiredWheelRotation;
+    private float maxWheelTurnSpeed;
+    private float wheelTurnSpeedMargin;
+
     //constant values
     private float frictionCoefficient;
     private float turnSpeed;
@@ -38,6 +43,11 @@ public class Car {
         bodyRotation = 0;
         relativeWheelAngle = 0;
         accelerationMagnitude = 0;
+
+        //test constants for da wheel
+        desiredWheelRotation = 60;
+        maxWheelTurnSpeed = 500;
+        wheelTurnSpeedMargin = 30;
 
         //all of the following are constants
         frictionCoefficient = 0.3f;
@@ -95,6 +105,11 @@ public class Car {
     public void update() {
 
         float deltaTime = Gdx.graphics.getDeltaTime(); //in seconds
+
+        //turn da wheeeeeel
+        float wheelTurnSpeed = accelerateToValue(-desiredWheelRotation * controlVector.x,
+                relativeWheelAngle, wheelTurnSpeedMargin, maxWheelTurnSpeed);
+        relativeWheelAngle += wheelTurnSpeed * deltaTime;
 
         //turn the car
         bodyRotation -= deltaTime * turnSpeed * controlVector.x;

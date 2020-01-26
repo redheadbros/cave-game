@@ -48,6 +48,7 @@ public class CarScene extends Scene {
 
         batch.draw(carRegion, carPosition.x, carPosition.y, carCenterX, carCenterY,
                 32,32,1,1, car.bodyRotation);
+        batch.draw(wheelRegion, screenWidth / 2 - 32, 0,32,32,64,64,1,1,car.relativeWheelAngle);
     }
 
     public void update() {
