@@ -13,12 +13,10 @@ public class Car {
     private Vector2 position; //in physics body
     private Vector2 velocity; //in physics body
     public float bodyRotation; //in physics body
-    public float relativeWheelAngle; //desired for wheel attractor
+    public float relativeWheelAngle; //current for wheel attractor
 
     //testing, turny wheel bits
     private float desiredWheelRotation;
-    private float maxWheelTurnSpeed; //in wheel attractor: max
-    private float wheelTurnSpeedMargin; //in wheel attractor: margin
 
     //constant values
     private float frictionCoefficient;
@@ -26,11 +24,6 @@ public class Car {
     private float turnVectorCoefficient;
 
     private float desiredSpeed; //desired for gas attractor
-    private float speedMargin; //in gas attractor: margin
-    private float maxAcceleration; //in gas attractor: max
-
-    private float brakeMargin; //in brake attractor: margin
-    private float maxBrake; //in brake attractor: max
 
     private Vector2 controlVector;
 
@@ -44,8 +37,6 @@ public class Car {
 
         //test constants for da wheel
         desiredWheelRotation = 60;
-        maxWheelTurnSpeed = 500; //moved
-        wheelTurnSpeedMargin = 30; //moved
 
         //all of the following are constants
         frictionCoefficient = 0.3f;
@@ -65,16 +56,13 @@ public class Car {
         //ANOTHER STRUCTURAL NOTE:
         //  Attractor class: just has the one function
         //  active variables class: contains position, rotation, velocity, turn speed, wheel angle etc
+        //        current name: CarPhysicsBody
         //  constants class: contains static classes that extend attractor, and all the constants.
         //    class could for instance be used in different versions of the same vehicle but with
         //    different parameters
+        //        current name: CarConstants
 
         desiredSpeed = 300;
-        speedMargin = 10; //moved
-        maxAcceleration = 1000; //moved
-
-        brakeMargin = 5;
-        maxBrake = 250;
 
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
@@ -112,8 +100,8 @@ public class Car {
         float deltaTime = Gdx.graphics.getDeltaTime(); //in seconds
 
         //turn da wheeeeeel
-        float wheelTurnSpeed = accelerateToValue(-desiredWheelRotation * controlVector.x,
-                relativeWheelAngle, wheelTurnSpeedMargin, maxWheelTurnSpeed);
+        float wheelTurnSpeed = CarConstants.WheelTurnAttractor.getRate(relativeWheelAngle,
+                -desiredWheelRotation * controlVector.x);
         relativeWheelAngle += wheelTurnSpeed * deltaTime;
 
         //turn the car
@@ -131,12 +119,12 @@ public class Car {
         float accelerationMagnitude;
         switch ((int) controlVector.y) {
             case 1:
-                accelerationMagnitude = accelerateToValue(desiredSpeed, velocity.len(), speedMargin, maxAcceleration);
+                accelerationMagnitude = CarConstants.AccelerationAttractor.getRate(velocity.len(), desiredSpeed);
                 acceleration.y = accelerationMagnitude;
                 acceleration.rotate(bodyRotation);
                 break;
             case -1:
-                accelerationMagnitude = accelerateToValue(0, velocity.len(), brakeMargin, maxBrake);
+                accelerationMagnitude = CarConstants.BrakeAttractor.getRate(velocity.len(), 0);
                 acceleration = velocity.cpy().nor().scl(accelerationMagnitude);
                 break;
             default:
