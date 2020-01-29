@@ -9,13 +9,7 @@ import static java.lang.Math.abs;
 
 public class Car {
 
-    public CarPhysicsBody physicsBody;
-
-    //values that change
-    private Vector2 position; //in physics body
-    private Vector2 velocity; //in physics body
-    public float bodyRotation; //in physics body
-    public float wheelAngle; //current for wheel attractor
+    private CarPhysicsBody physicsBody;
 
     //testing, turny wheel bits
     private float desiredWheelRotation;
@@ -35,9 +29,6 @@ public class Car {
 
         controlVector = new Vector2(0,0);
         physicsBody.position = new Vector2(256,256);
-        physicsBody.velocity = new Vector2(0,0);
-        physicsBody.bodyRotation = 0;
-        physicsBody.wheelAngle = 0;
 
         //test constants for da wheel
         desiredWheelRotation = 60;
@@ -106,9 +97,8 @@ public class Car {
         //turn da wheeeeeel
         float wheelTurnSpeed = CarConstants.WheelTurnAttractor.getRate(physicsBody.wheelAngle,
                 -desiredWheelRotation * controlVector.x);
-        physicsBody.wheelAngle += wheelTurnSpeed * deltaTime;
 
-        //turn the car
+        //turn the car (should be moved later)
         physicsBody.bodyRotation -= deltaTime * bodyTurnSpeed * controlVector.x;
 
         //calculate forces / acceleration:
@@ -139,11 +129,7 @@ public class Car {
         acceleration.add(friction);
         acceleration.add(turnPower);
 
-        //apply acceleration to velocity
-        physicsBody.velocity.mulAdd(acceleration, deltaTime);
-
-        //apply velocity to position
-        physicsBody.position.mulAdd(physicsBody.velocity, deltaTime);
+        physicsBody.update(acceleration,0, wheelTurnSpeed);
     }
 
     public CarPhysicsBody getPhysicsBody() {
@@ -153,14 +139,5 @@ public class Car {
     public void clampPositionTo(int minX, int maxX, int minY, int maxY) {
         physicsBody.position.x = Math.max(minX, Math.min(physicsBody.position.x, maxX));
         physicsBody.position.y = Math.max(minY, Math.min(physicsBody.position.y, maxY));
-    }
-
-    private float accelerateToValue(float desiredValue, float currentValue, float margin, float maxAcceleration) {
-        float maxRateOfChange = abs(maxAcceleration);
-        if (currentValue >= desiredValue) {
-            return Math.max(-maxRateOfChange, -(currentValue - desiredValue) * maxRateOfChange / margin);
-        } else {
-            return Math.min(maxRateOfChange, -(currentValue - desiredValue) * maxRateOfChange / margin);
-        }
     }
 }
