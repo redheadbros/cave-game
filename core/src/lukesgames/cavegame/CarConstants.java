@@ -29,4 +29,12 @@ public class CarConstants {
             return Attractor.staticGetRate(maxBrake, brakeMargin, currentSpeed, desiredSpeed);
         }
     }
+
+    public static class FrictionAttractor {
+        public static float frictionMargin = 5;
+        public static float maxFriction = coefficientOfFriction * 300;
+        public static float getRate(float currentSpeed, float desiredSpeed) {
+            return Attractor.staticGetRate(maxFriction, frictionMargin, currentSpeed, desiredSpeed);
+        }
+    }
 }

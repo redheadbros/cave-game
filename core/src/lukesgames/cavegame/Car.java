@@ -21,6 +21,8 @@ public class Car {
         controlVector = new Vector2(0,0);
 
         physicsBody.position = new Vector2(256,256);
+        physicsBody.velocity.y = 300;
+        physicsBody.bodyTurnSpeed = 180;
 
         desiredWheelRotation = 60;
         desiredSpeed = 300;
@@ -70,25 +72,40 @@ public class Car {
         wheelTurningRate = CarConstants.WheelTurnAttractor.getRate(physicsBody.wheelAngle,
                 desiredWheelRotation * -controlVector.x);
 
-        //calculate ambient PA and RA here (before gas gas gas)
+        //do friction and rotational drag here
+        //friction
+        Vector2 friction = physicsBody.velocity.cpy().nor();
+        friction.scl(CarConstants.FrictionAttractor.getRate(physicsBody.velocity.len(), 0));
+        acceleration.add(friction);
+        //rotational drag
+        float rotationalSpeedInPixels = physicsBody.bodyTurnSpeed * 2 * ((float) Math.PI) * CarConstants.radius / 360;
+        float tangentialFrictionForce = CarConstants.FrictionAttractor.getRate(rotationalSpeedInPixels, 0);
+        float rotationalDrag = tangentialFrictionForce / CarConstants.radius;
+        bodyTurningAcceleration += rotationalDrag;
 
-        //calculate gas-powered acceleration vector
-        switch ((int) controlVector.y) {
-            case 1: //pressin da gas
-                Vector2 accelerationDirection = new Vector2(0,1);
-                accelerationDirection.rotate(physicsBody.bodyRotation + physicsBody.wheelAngle);
-                float currentRelativeSpeed = physicsBody.velocity.dot(accelerationDirection);
-                float accelerationMagnitude = CarConstants.AccelerationAttractor
-                        .getRate(currentRelativeSpeed, desiredSpeed);
-                Vector2 gasPoweredAcceleration = accelerationDirection.scl(accelerationMagnitude);
+        //note: friction may/should differ based on the direction of the wheels, and whether it's rotational
+        //      or in the forwards direction?
+        // option: use a different friction function, JUST for the forward friction.
 
-                acceleration.add(gasPoweredAcceleration);
-                //set ambient stuff to zero here
-                break;
-            case -1: //wheel brake
-                break;
-            default:
-                break;
+        if (!handBrake) {
+            //calculate gas-powered acceleration vector
+            switch ((int) controlVector.y) {
+                case 1: //pressin da gas
+                    Vector2 accelerationDirection = new Vector2(0,1);
+                    accelerationDirection.rotate(physicsBody.bodyRotation + physicsBody.wheelAngle);
+                    float currentRelativeSpeed = physicsBody.velocity.dot(accelerationDirection);
+                    float accelerationMagnitude = CarConstants.AccelerationAttractor
+                            .getRate(currentRelativeSpeed, desiredSpeed);
+                    Vector2 gasPoweredAcceleration = accelerationDirection.scl(accelerationMagnitude);
+
+                    acceleration.add(gasPoweredAcceleration);
+                    break;
+                case -1: //wheel brake
+                    //no break statement, continue to add ambient PA and RA
+                default:
+                    //do ambient PA and RA here
+                    break;
+            }
         }
 
         physicsBody.update(acceleration,bodyTurningAcceleration,wheelTurningRate);
