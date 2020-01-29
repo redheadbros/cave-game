@@ -10,28 +10,27 @@ import static java.lang.Math.abs;
 public class Car {
 
     //values that change
-    private Vector2 position;
-    private Vector2 velocity;
-    public float bodyRotation;
-    public float relativeWheelAngle;
-    private float accelerationMagnitude;
+    private Vector2 position; //in physics body
+    private Vector2 velocity; //in physics body
+    public float bodyRotation; //in physics body
+    public float relativeWheelAngle; //desired for wheel attractor
 
     //testing, turny wheel bits
     private float desiredWheelRotation;
-    private float maxWheelTurnSpeed;
-    private float wheelTurnSpeedMargin;
+    private float maxWheelTurnSpeed; //in wheel attractor: max
+    private float wheelTurnSpeedMargin; //in wheel attractor: margin
 
     //constant values
     private float frictionCoefficient;
-    private float turnSpeed;
+    private float turnSpeed; //in physics body
     private float turnVectorCoefficient;
 
-    private float desiredSpeed;
-    private float speedMargin;
-    private float maxAcceleration;
+    private float desiredSpeed; //desired for gas attractor
+    private float speedMargin; //in gas attractor: margin
+    private float maxAcceleration; //in gas attractor: max
 
-    private float brakeMargin;
-    private float maxBrake;
+    private float brakeMargin; //in brake attractor: margin
+    private float maxBrake; //in brake attractor: max
 
     private Vector2 controlVector;
 
@@ -42,12 +41,11 @@ public class Car {
         velocity = new Vector2(0,0);
         bodyRotation = 0;
         relativeWheelAngle = 0;
-        accelerationMagnitude = 0;
 
         //test constants for da wheel
         desiredWheelRotation = 60;
-        maxWheelTurnSpeed = 500;
-        wheelTurnSpeedMargin = 30;
+        maxWheelTurnSpeed = 500; //moved
+        wheelTurnSpeedMargin = 30; //moved
 
         //all of the following are constants
         frictionCoefficient = 0.3f;
@@ -64,9 +62,16 @@ public class Car {
         //  do the dot product of the velocity of the car and the direction of the wheels
         //  to get a measure of how much effective an acceleration attempt should be.
 
+        //ANOTHER STRUCTURAL NOTE:
+        //  Attractor class: just has the one function
+        //  active variables class: contains position, rotation, velocity, turn speed, wheel angle etc
+        //  constants class: contains static classes that extend attractor, and all the constants.
+        //    class could for instance be used in different versions of the same vehicle but with
+        //    different parameters
+
         desiredSpeed = 300;
-        speedMargin = 10;
-        maxAcceleration = 1000;
+        speedMargin = 10; //moved
+        maxAcceleration = 1000; //moved
 
         brakeMargin = 5;
         maxBrake = 250;
@@ -123,6 +128,7 @@ public class Car {
 
         //get acceleration power
         Vector2 acceleration = new Vector2(0,0);
+        float accelerationMagnitude;
         switch ((int) controlVector.y) {
             case 1:
                 accelerationMagnitude = accelerateToValue(desiredSpeed, velocity.len(), speedMargin, maxAcceleration);

@@ -20,4 +20,12 @@ public class Attractor {
             return Math.min(maxAttractionRate, -(currentValue - desiredValue) * maxAttractionRate / marginOfAttraction);
         }
     }
+
+    public static float staticGetRate(float maxRate, float dampingRadius, float currentValue, float desiredValue) {
+        if (currentValue >= desiredValue) {
+            return Math.max(-maxRate, -(currentValue - desiredValue) * maxRate / dampingRadius);
+        } else {
+            return Math.min(maxRate, -(currentValue - desiredValue) * maxRate / dampingRadius);
+        }
+    }
 }
