@@ -44,11 +44,12 @@ public class CarScene extends Scene {
         //batch.draw(background,0,0); //add this in when you have a pic
 
         car.clampPositionTo(0, screenWidth-32,64, screenHeight + 32);
-        Vector2 carPosition = car.getPosition();
+        CarPhysicsBody carPhysicsBody = car.getPhysicsBody();
 
-        batch.draw(carRegion, carPosition.x, carPosition.y, carCenterX, carCenterY,
-                32,32,1,1, car.bodyRotation);
-        batch.draw(wheelRegion, screenWidth / 2 - 32, 0,32,32,64,64,1,1,car.relativeWheelAngle);
+        batch.draw(carRegion, carPhysicsBody.position.x, carPhysicsBody.position.y, carCenterX, carCenterY,
+                32,32,1,1, carPhysicsBody.bodyRotation);
+        batch.draw(wheelRegion, screenWidth / 2 - 32, 0,32,32,64,64,
+                1,1,carPhysicsBody.wheelAngle);
     }
 
     public void update() {

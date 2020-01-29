@@ -9,18 +9,20 @@ import static java.lang.Math.abs;
 
 public class Car {
 
+    public CarPhysicsBody physicsBody;
+
     //values that change
     private Vector2 position; //in physics body
     private Vector2 velocity; //in physics body
     public float bodyRotation; //in physics body
-    public float relativeWheelAngle; //current for wheel attractor
+    public float wheelAngle; //current for wheel attractor
 
     //testing, turny wheel bits
     private float desiredWheelRotation;
 
     //constant values
     private float frictionCoefficient;
-    private float turnSpeed; //in physics body
+    private float bodyTurnSpeed; //in physics body
     private float turnVectorCoefficient;
 
     private float desiredSpeed; //desired for gas attractor
@@ -29,18 +31,20 @@ public class Car {
 
 
     public Car() {
+        physicsBody = new CarPhysicsBody();
+
         controlVector = new Vector2(0,0);
-        position = new Vector2(256,256);
-        velocity = new Vector2(0,0);
-        bodyRotation = 0;
-        relativeWheelAngle = 0;
+        physicsBody.position = new Vector2(256,256);
+        physicsBody.velocity = new Vector2(0,0);
+        physicsBody.bodyRotation = 0;
+        physicsBody.wheelAngle = 0;
 
         //test constants for da wheel
         desiredWheelRotation = 60;
 
         //all of the following are constants
         frictionCoefficient = 0.3f;
-        turnSpeed = 180; //degrees per second
+        bodyTurnSpeed = 180; //degrees per second
         turnVectorCoefficient = 3f;
         //note: the turning looks realistic, but is a facade. If the turnVectorCoefficient
         //  is increased, the car constantly looks like it's 'drifting.' It needs to be
@@ -100,32 +104,32 @@ public class Car {
         float deltaTime = Gdx.graphics.getDeltaTime(); //in seconds
 
         //turn da wheeeeeel
-        float wheelTurnSpeed = CarConstants.WheelTurnAttractor.getRate(relativeWheelAngle,
+        float wheelTurnSpeed = CarConstants.WheelTurnAttractor.getRate(physicsBody.wheelAngle,
                 -desiredWheelRotation * controlVector.x);
-        relativeWheelAngle += wheelTurnSpeed * deltaTime;
+        physicsBody.wheelAngle += wheelTurnSpeed * deltaTime;
 
         //turn the car
-        bodyRotation -= deltaTime * turnSpeed * controlVector.x;
+        physicsBody.bodyRotation -= deltaTime * bodyTurnSpeed * controlVector.x;
 
         //calculate forces / acceleration:
         //calculate friction acceleration
-        Vector2 friction = velocity.cpy().scl(-frictionCoefficient);
+        Vector2 friction = physicsBody.velocity.cpy().scl(-frictionCoefficient);
 
         //calculate turning vector, perpendicular to velocity
-        Vector2 turnPower = velocity.cpy().rotate(-90).scl(controlVector.x * turnVectorCoefficient);
+        Vector2 turnPower = physicsBody.velocity.cpy().rotate(-90).scl(controlVector.x * turnVectorCoefficient);
 
         //get acceleration power
         Vector2 acceleration = new Vector2(0,0);
         float accelerationMagnitude;
         switch ((int) controlVector.y) {
             case 1:
-                accelerationMagnitude = CarConstants.AccelerationAttractor.getRate(velocity.len(), desiredSpeed);
+                accelerationMagnitude = CarConstants.AccelerationAttractor.getRate(physicsBody.velocity.len(), desiredSpeed);
                 acceleration.y = accelerationMagnitude;
-                acceleration.rotate(bodyRotation);
+                acceleration.rotate(physicsBody.bodyRotation);
                 break;
             case -1:
-                accelerationMagnitude = CarConstants.BrakeAttractor.getRate(velocity.len(), 0);
-                acceleration = velocity.cpy().nor().scl(accelerationMagnitude);
+                accelerationMagnitude = CarConstants.BrakeAttractor.getRate(physicsBody.velocity.len(), 0);
+                acceleration = physicsBody.velocity.cpy().nor().scl(accelerationMagnitude);
                 break;
             default:
                 break;
@@ -136,19 +140,19 @@ public class Car {
         acceleration.add(turnPower);
 
         //apply acceleration to velocity
-        velocity.mulAdd(acceleration, deltaTime);
+        physicsBody.velocity.mulAdd(acceleration, deltaTime);
 
         //apply velocity to position
-        position.mulAdd(velocity, deltaTime);
+        physicsBody.position.mulAdd(physicsBody.velocity, deltaTime);
     }
 
-    public Vector2 getPosition() {
-        return position;
+    public CarPhysicsBody getPhysicsBody() {
+        return physicsBody;
     }
 
     public void clampPositionTo(int minX, int maxX, int minY, int maxY) {
-        position.x = Math.max(minX, Math.min(position.x, maxX));
-        position.y = Math.max(minY, Math.min(position.y, maxY));
+        physicsBody.position.x = Math.max(minX, Math.min(physicsBody.position.x, maxX));
+        physicsBody.position.y = Math.max(minY, Math.min(physicsBody.position.y, maxY));
     }
 
     private float accelerateToValue(float desiredValue, float currentValue, float margin, float maxAcceleration) {
