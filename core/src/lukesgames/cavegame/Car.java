@@ -44,10 +44,6 @@ public class Car {
         //  solution, perhaps: how the BODY of the car turns should be based off of other
         //  stuff, like speed and the turn vector.
 
-        //IMPORTANT IDEA NOTE:
-        //  do the dot product of the velocity of the car and the direction of the wheels
-        //  to get a measure of how much effective an acceleration attempt should be.
-
         //ANOTHER STRUCTURAL NOTE:
         //  Attractor class: just has the one function
         //  active variables class: contains position, rotation, velocity, turn speed, wheel angle etc
