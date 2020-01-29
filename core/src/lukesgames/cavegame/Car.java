@@ -11,8 +11,10 @@ public class Car {
 
     private CarPhysicsBody physicsBody;
     private Vector2 controlVector;
+    private boolean handBrake;
 
     private float desiredWheelRotation;
+    private float desiredSpeed;
 
     public Car() {
         physicsBody = new CarPhysicsBody();
@@ -21,6 +23,7 @@ public class Car {
         physicsBody.position = new Vector2(256,256);
 
         desiredWheelRotation = 60;
+        desiredSpeed = 300;
 
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
@@ -33,6 +36,8 @@ public class Car {
                     controlVector.x -= 1;
                 } else if (keyCode == Input.Keys.RIGHT) {
                     controlVector.x += 1;
+                } else if (keyCode == Input.Keys.SPACE) {
+                    handBrake = true;
                 }
                 return true;
             }
@@ -47,6 +52,8 @@ public class Car {
                     controlVector.x += 1;
                 } else if (keyCode == Input.Keys.RIGHT) {
                     controlVector.x -= 1;
+                } else if (keyCode == Input.Keys.SPACE) {
+                    handBrake = false;
                 }
                 return true;
             }
@@ -60,7 +67,29 @@ public class Car {
         Vector2 acceleration = new Vector2(0,0);
 
         //turning the steering wheel
-        wheelTurningRate = CarConstants.WheelTurnAttractor.getRate(physicsBody.wheelAngle, desiredWheelRotation * -controlVector.x);
+        wheelTurningRate = CarConstants.WheelTurnAttractor.getRate(physicsBody.wheelAngle,
+                desiredWheelRotation * -controlVector.x);
+
+        //calculate ambient PA and RA here (before gas gas gas)
+
+        //calculate gas-powered acceleration vector
+        switch ((int) controlVector.y) {
+            case 1: //pressin da gas
+                Vector2 accelerationDirection = new Vector2(0,1);
+                accelerationDirection.rotate(physicsBody.bodyRotation + physicsBody.wheelAngle);
+                float currentRelativeSpeed = physicsBody.velocity.dot(accelerationDirection);
+                float accelerationMagnitude = CarConstants.AccelerationAttractor
+                        .getRate(currentRelativeSpeed, desiredSpeed);
+                Vector2 gasPoweredAcceleration = accelerationDirection.scl(accelerationMagnitude);
+
+                acceleration.add(gasPoweredAcceleration);
+                //set ambient stuff to zero here
+                break;
+            case -1: //wheel brake
+                break;
+            default:
+                break;
+        }
 
         physicsBody.update(acceleration,bodyTurningAcceleration,wheelTurningRate);
     }

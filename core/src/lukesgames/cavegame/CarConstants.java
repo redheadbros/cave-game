@@ -2,6 +2,8 @@ package lukesgames.cavegame;
 
 public class CarConstants {
 
+    public static float coefficientOfFriction = 1;
+    public static float radius = 22; //approximate square root of 512
 
     //attractors
     public static class WheelTurnAttractor {
