@@ -2,8 +2,10 @@ package lukesgames.cavegame;
 
 public class CarConstants {
 
-    public static float coefficientOfFriction = 1;
+    public static float coefficientOfFriction = 0.7f;
     public static float radius = 22; //approximate square root of 512
+    public static float desiredTurnSpeedFactor = 5;
+    public static float turningPower = 3;
 
     //attractors
     public static class WheelTurnAttractor {
@@ -35,6 +37,14 @@ public class CarConstants {
         public static float maxFriction = coefficientOfFriction * 300;
         public static float getRate(float currentSpeed, float desiredSpeed) {
             return Attractor.staticGetRate(maxFriction, frictionMargin, currentSpeed, desiredSpeed);
+        }
+    }
+
+    public static class RotationAttractor {
+        public static float spinSpeedMargin = 50;
+        public static float maxRotationalAcceleration = 300;
+        public static float getRate(float currentAngularSpeed, float desiredAngularSpeed) {
+            return Attractor.staticGetRate(maxRotationalAcceleration, spinSpeedMargin, currentAngularSpeed, desiredAngularSpeed);
         }
     }
 }
