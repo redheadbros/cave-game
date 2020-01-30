@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.min;
 
 public class Car {
 
@@ -35,8 +36,8 @@ public class Car {
 
         //all of the following are constants
         frictionCoefficient = 0.3f;
-        bodyTurnSpeed = 180; //degrees per second
-        turnVectorCoefficient = 3f;
+        bodyTurnSpeed = 180f; //originally 180 degrees per second
+        turnVectorCoefficient = 3.2f;
         //note: the turning looks realistic, but is a facade. If the turnVectorCoefficient
         //  is increased, the car constantly looks like it's 'drifting.' It needs to be
         //  a formula based off of other stuff, though I'm not sure what.
@@ -98,9 +99,6 @@ public class Car {
         float wheelTurnSpeed = CarConstants.WheelTurnAttractor.getRate(physicsBody.wheelAngle,
                 -desiredWheelRotation * controlVector.x);
 
-        //turn the car (should be moved later)
-        physicsBody.bodyRotation -= deltaTime * bodyTurnSpeed * controlVector.x;
-
         //calculate forces / acceleration:
         //calculate friction acceleration
         Vector2 friction = physicsBody.velocity.cpy().scl(-frictionCoefficient);
@@ -130,6 +128,15 @@ public class Car {
         acceleration.add(turnPower);
 
         physicsBody.update(acceleration,0, wheelTurnSpeed);
+
+        //turn the car
+        float angleToVelocity = (physicsBody.velocity.angle() - 90) - (physicsBody.bodyRotation);
+        float approxTurnAngle = deltaTime * -bodyTurnSpeed * controlVector.x;
+        if ((abs(angleToVelocity) < 175) && (abs(angleToVelocity) > 1)) {
+            physicsBody.bodyRotation += angleToVelocity;
+        } else {
+            physicsBody.bodyRotation += approxTurnAngle;
+        }
     }
 
     public CarPhysicsBody getPhysicsBody() {

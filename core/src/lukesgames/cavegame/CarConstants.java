@@ -22,9 +22,11 @@ public class CarConstants {
 
     public static class BrakeAttractor {
         public static float brakeMargin = 5;
-        public static float maxBrake = 250;
+        public static float maxBrake = 400;
         public static float getRate(float currentSpeed, float desiredSpeed) {
             return Attractor.staticGetRate(maxBrake, brakeMargin, currentSpeed, desiredSpeed);
         }
     }
+
+    //add friction attractor
 }
