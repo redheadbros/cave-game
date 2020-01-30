@@ -33,8 +33,6 @@ public class CarScene extends Scene {
         //background = new Texture(Gdx.files.internal("car game background.png"));
         carImage = new Texture(Gdx.files.internal("carmobile.png"));
         carRegion = new TextureRegion(carImage,0,0,32,32);
-        steeringWheel = new Texture(Gdx.files.internal("steering wheel.png"));
-        wheelRegion = new TextureRegion(steeringWheel,0,0,64,64);
     }
 
     @Override
@@ -48,8 +46,6 @@ public class CarScene extends Scene {
 
         batch.draw(carRegion, carPhysicsBody.position.x, carPhysicsBody.position.y, carCenterX, carCenterY,
                 32,32,1,1, carPhysicsBody.bodyRotation);
-        batch.draw(wheelRegion, screenWidth / 2 - 32, 0,32,32,64,64,
-                1,1,carPhysicsBody.wheelAngle);
     }
 
     public void update() {
@@ -61,6 +57,5 @@ public class CarScene extends Scene {
         //dispose of textures
         //background.dispose();
         carImage.dispose();
-        steeringWheel.dispose();
     }
 }

@@ -11,18 +11,9 @@ import static java.lang.Math.min;
 public class Car {
 
     private CarPhysicsBody physicsBody;
-
-    //testing, turny wheel bits
-    private float desiredWheelRotation;
-
+    private Vector2 controlVector;
     //constant values
     private float frictionCoefficient;
-    private float turnSpeedCoefficient;
-
-    private float desiredSpeed; //desired for gas attractor
-
-    private Vector2 controlVector;
-
 
     public Car() {
         physicsBody = new CarPhysicsBody();
@@ -30,23 +21,10 @@ public class Car {
         controlVector = new Vector2(0,0);
         physicsBody.position = new Vector2(256,256);
 
-        //test constants for da wheel
-        desiredWheelRotation = 60;
-
-        //all of the following are constants
+        //all of the following are constants:
         frictionCoefficient = 0.3f;
-        //note: the turning looks realistic, but is a facade. If the turnVectorCoefficient
-        //  is increased, the car constantly looks like it's 'drifting.' It needs to be
-        //  a formula based off of other stuff, though I'm not sure what.
-        //  also, the car can turn in place like a tank, currently. Not so realistic.
-        //  solution, perhaps: how the BODY of the car turns should be based off of other
-        //  stuff, like speed and the turn vector.
 
-        //IMPORTANT IDEA NOTE:
-        //  do the dot product of the velocity of the car and the direction of the wheels
-        //  to get a measure of how much effective an acceleration attempt should be.
-
-        //ANOTHER STRUCTURAL NOTE:
+        //STRUCTURAL NOTE:
         //  Attractor class: just has the one function
         //  active variables class: contains position, rotation, velocity, turn speed, wheel angle etc
         //        current name: CarPhysicsBody
@@ -54,8 +32,6 @@ public class Car {
         //    class could for instance be used in different versions of the same vehicle but with
         //    different parameters
         //        current name: CarConstants
-
-        desiredSpeed = 300;
 
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
@@ -112,7 +88,7 @@ public class Car {
         float accelerationMagnitude;
         switch ((int) controlVector.y) {
             case 1:
-                accelerationMagnitude = CarConstants.AccelerationAttractor.getRate(physicsBody.velocity.len(), desiredSpeed);
+                accelerationMagnitude = CarConstants.AccelerationAttractor.getRate(physicsBody.velocity.len(), CarConstants.desiredSpeed);
                 acceleration.y = accelerationMagnitude;
                 acceleration.rotate(physicsBody.bodyRotation);
                 break;
