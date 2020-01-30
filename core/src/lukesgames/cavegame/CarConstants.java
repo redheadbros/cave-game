@@ -2,6 +2,8 @@ package lukesgames.cavegame;
 
 public class CarConstants {
 
+    public static float bodyTurnSpeed = 180;
+
 
     //attractors
     public static class WheelTurnAttractor {

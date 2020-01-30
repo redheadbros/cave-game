@@ -17,8 +17,7 @@ public class Car {
 
     //constant values
     private float frictionCoefficient;
-    private float bodyTurnSpeed; //in physics body
-    private float turnVectorCoefficient;
+    private float turnSpeedCoefficient;
 
     private float desiredSpeed; //desired for gas attractor
 
@@ -36,8 +35,7 @@ public class Car {
 
         //all of the following are constants
         frictionCoefficient = 0.3f;
-        bodyTurnSpeed = 180f; //originally 180 degrees per second
-        turnVectorCoefficient = 3.2f;
+        turnSpeedCoefficient = 200; //originally 3.2 with old formula
         //note: the turning looks realistic, but is a facade. If the turnVectorCoefficient
         //  is increased, the car constantly looks like it's 'drifting.' It needs to be
         //  a formula based off of other stuff, though I'm not sure what.
@@ -104,7 +102,10 @@ public class Car {
         Vector2 friction = physicsBody.velocity.cpy().scl(-frictionCoefficient);
 
         //calculate turning vector, perpendicular to velocity
-        Vector2 turnPower = physicsBody.velocity.cpy().rotate(-90).scl(controlVector.x * turnVectorCoefficient);
+        //Vector2 turnPower = physicsBody.velocity.cpy().rotate(-90).scl(controlVector.x * turnSpeedCoefficient);
+        float velocityTurnSpeed = -controlVector.x * turnSpeedCoefficient;
+        physicsBody.velocity.rotate(velocityTurnSpeed * deltaTime);
+        physicsBody.bodyRotation += velocityTurnSpeed * deltaTime;
 
         //get acceleration power
         Vector2 acceleration = new Vector2(0,0);
@@ -125,18 +126,20 @@ public class Car {
 
         //create acceleration vector
         acceleration.add(friction);
-        acceleration.add(turnPower);
+        //acceleration.add(turnPower);
 
         physicsBody.update(acceleration,0, wheelTurnSpeed);
 
         //turn the car
-        float angleToVelocity = (physicsBody.velocity.angle() - 90) - (physicsBody.bodyRotation);
-        float approxTurnAngle = deltaTime * -bodyTurnSpeed * controlVector.x;
+        //note: could use difference in angle to define a desired velocity, then apply acceleration
+        //      to that velocity.
+        /*float angleToVelocity = (physicsBody.velocity.angle() - 90) - (physicsBody.bodyRotation);
+        float approxTurnAngle = deltaTime * -CarConstants.bodyTurnSpeed * controlVector.x;
         if ((abs(angleToVelocity) < 175) && (abs(angleToVelocity) > 1)) {
             physicsBody.bodyRotation += angleToVelocity;
         } else {
             physicsBody.bodyRotation += approxTurnAngle;
-        }
+        }*/
     }
 
     public CarPhysicsBody getPhysicsBody() {
