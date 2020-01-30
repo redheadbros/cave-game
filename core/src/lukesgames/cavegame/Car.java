@@ -35,7 +35,6 @@ public class Car {
 
         //all of the following are constants
         frictionCoefficient = 0.3f;
-        turnSpeedCoefficient = 200; //originally 3.2 with old formula
         //note: the turning looks realistic, but is a facade. If the turnVectorCoefficient
         //  is increased, the car constantly looks like it's 'drifting.' It needs to be
         //  a formula based off of other stuff, though I'm not sure what.
@@ -94,18 +93,19 @@ public class Car {
         float deltaTime = Gdx.graphics.getDeltaTime(); //in seconds
 
         //turn da wheeeeeel
-        float wheelTurnSpeed = CarConstants.WheelTurnAttractor.getRate(physicsBody.wheelAngle,
-                -desiredWheelRotation * controlVector.x);
+        //float wheelTurnSpeed = CarConstants.WheelTurnAttractor.getRate(physicsBody.wheelAngle,-desiredWheelRotation * controlVector.x);
+        float wheelTurnSpeed = 0;
 
         //calculate forces / acceleration:
         //calculate friction acceleration
-        Vector2 friction = physicsBody.velocity.cpy().scl(-frictionCoefficient);
+        float frictionMagnitude = frictionCoefficient * CarConstants.FrictionAttractor.getRate(physicsBody.velocity.len(), 0);
+        Vector2 friction = physicsBody.velocity.cpy().scl(frictionMagnitude);
 
-        //calculate turning vector, perpendicular to velocity
-        //Vector2 turnPower = physicsBody.velocity.cpy().rotate(-90).scl(controlVector.x * turnSpeedCoefficient);
-        float velocityTurnSpeed = -controlVector.x * turnSpeedCoefficient;
-        physicsBody.velocity.rotate(velocityTurnSpeed * deltaTime);
-        physicsBody.bodyRotation += velocityTurnSpeed * deltaTime;
+        //turn both the velocity and the car's body
+        float velocityTurnSpeed = -controlVector.x * CarConstants.turnSpeedCoefficient;
+        float angleToTurn = velocityTurnSpeed * deltaTime * physicsBody.velocity.len();
+        physicsBody.velocity.rotate(angleToTurn);
+        physicsBody.bodyRotation += angleToTurn;
 
         //get acceleration power
         Vector2 acceleration = new Vector2(0,0);
@@ -126,20 +126,8 @@ public class Car {
 
         //create acceleration vector
         acceleration.add(friction);
-        //acceleration.add(turnPower);
 
         physicsBody.update(acceleration,0, wheelTurnSpeed);
-
-        //turn the car
-        //note: could use difference in angle to define a desired velocity, then apply acceleration
-        //      to that velocity.
-        /*float angleToVelocity = (physicsBody.velocity.angle() - 90) - (physicsBody.bodyRotation);
-        float approxTurnAngle = deltaTime * -CarConstants.bodyTurnSpeed * controlVector.x;
-        if ((abs(angleToVelocity) < 175) && (abs(angleToVelocity) > 1)) {
-            physicsBody.bodyRotation += angleToVelocity;
-        } else {
-            physicsBody.bodyRotation += approxTurnAngle;
-        }*/
     }
 
     public CarPhysicsBody getPhysicsBody() {
