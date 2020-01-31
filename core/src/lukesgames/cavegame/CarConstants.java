@@ -4,7 +4,7 @@ public class CarConstants {
 
     public static float bodyTurnSpeed = 180;
     public static float turnSpeedCoefficient = 0.75f;
-    public static float desiredSpeed = 300;
+    public static float desiredSpeed = 150;
 
 
     //attractors
@@ -35,7 +35,7 @@ public class CarConstants {
     //add friction attractor
     public static class FrictionAttractor {
         public static float speedMargin = 0.01f;
-        public static float maxFriction = 1f;
+        public static float maxFriction = 0f;
         public static float getRate(float currentSpeed, float desiredSpeed) {
             return Attractor.staticGetRate(maxFriction,  speedMargin, currentSpeed, desiredSpeed);
         }

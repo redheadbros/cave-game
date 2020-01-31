@@ -9,7 +9,7 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "zzoomm go fffaaaaaaaast";
 		config.width = 512;
-		config.height = 512 + 64;
+		config.height = 512 + 64 + 32;
 		new LwjglApplication(new CaveGame(), config);
 	}
 }

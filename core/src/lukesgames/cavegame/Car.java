@@ -11,14 +11,14 @@ import static java.lang.Math.min;
 public class Car {
 
     private CarPhysicsBody physicsBody;
-    private Vector2 controlVector;
+    //private Vector2 controlVector;
     //constant values
     private float frictionCoefficient;
 
     public Car() {
         physicsBody = new CarPhysicsBody();
 
-        controlVector = new Vector2(0,0);
+        //controlVector = new Vector2(0,0);
         physicsBody.position = new Vector2(256,256);
 
         //all of the following are constants:
@@ -33,7 +33,7 @@ public class Car {
         //    different parameters
         //        current name: CarConstants
 
-        Gdx.input.setInputProcessor(new InputAdapter() {
+        /*Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
             public boolean keyDown(int keyCode) {
                 if (keyCode == Input.Keys.UP) {
@@ -61,10 +61,10 @@ public class Car {
                 }
                 return true;
             }
-        });
+        });*/
     }
 
-    public void update() {
+    public void update(CarController controller) {
 
         float deltaTime = Gdx.graphics.getDeltaTime(); //in seconds
 
@@ -78,7 +78,7 @@ public class Car {
         Vector2 friction = physicsBody.velocity.cpy().scl(frictionMagnitude);
 
         //turn both the velocity and the car's body
-        float velocityTurnSpeed = -controlVector.x * CarConstants.turnSpeedCoefficient;
+        float velocityTurnSpeed = -controller.controlVector.x * CarConstants.turnSpeedCoefficient;
         float angleToTurn = velocityTurnSpeed * deltaTime * physicsBody.velocity.len();
         physicsBody.velocity.rotate(angleToTurn);
         physicsBody.bodyRotation += angleToTurn;
@@ -86,7 +86,7 @@ public class Car {
         //get acceleration power
         Vector2 acceleration = new Vector2(0,0);
         float accelerationMagnitude;
-        switch ((int) controlVector.y) {
+        switch ((int) controller.controlVector.y) {
             case 1:
                 accelerationMagnitude = CarConstants.AccelerationAttractor.getRate(physicsBody.velocity.len(), CarConstants.desiredSpeed);
                 acceleration.y = accelerationMagnitude;
