@@ -2,11 +2,11 @@ package lukesgames.cavegame;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class State {
+public class SceneManager {
     Scene[] scenes;
     int currentScene;
 
-    public State() {
+    public SceneManager() {
         scenes = new Scene[1];
         Scene outdoorScene = new CarScene();
         scenes[0] = outdoorScene;

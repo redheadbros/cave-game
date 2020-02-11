@@ -3,8 +3,8 @@ package lukesgames.cavegame;
 public class CarConstants {
 
     public static float bodyTurnSpeed = 180;
-    public static float turnSpeedCoefficient = 0.75f;
-    public static float desiredSpeed = 150;
+    public static float turnSpeedCoefficient = 1f;
+    public static float desiredSpeed = 300;
 
 
     //attractors
