@@ -6,8 +6,10 @@ import com.badlogic.gdx.math.Vector2;
 public class CarPhysicsBody {
     public Vector2 position;
     public Vector2 velocity;
-    public float bodyRotation;
+    public float bodyRotation; //make it relative to velocity?
     public float bodyTurnSpeed;
+
+    //may remove this later
     public float wheelAngle;
 
     public CarPhysicsBody() {
